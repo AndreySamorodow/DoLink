@@ -20,8 +20,4 @@ async def get_session() -> AsyncGenerator[AsyncSession, None]:
     async with new_session() as session:
         yield session
 
-@app.post("/1")
-async def ece(session: Annotated[AsyncSession, Depends(get_session)]):
-    new_slug = Users(id=1, name="Vasya", email="inwdownd", hashed_password="kkkwwwii9823838")
-    session.add(new_slug)
-    await session.commit()
+#session: Annotated[AsyncSession, Depends(get_session)]
