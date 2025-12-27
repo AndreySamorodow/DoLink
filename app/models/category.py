@@ -7,7 +7,7 @@ class Category(Base):
     __tablename__ = "categories"
 
     id = Column(Integer, primary_key=True, nullable=False)
-    name = Column(String, nullable=False)
+    name = Column(String, unique=True, nullable=False)
 
     tasks = relationship("Task", back_populates="category") #There can be many tasks of the same category.
 

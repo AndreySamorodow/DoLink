@@ -1,10 +1,10 @@
-from typing import Annotated, AsyncGenerator
-from fastapi import Depends, FastAPI
 from contextlib import asynccontextmanager
-from app.database.database import engine, Base, new_session
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.users import Users
+from fastapi import FastAPI
+from app.routers import tasks_router
+
+from app.database.database import engine, Base
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -12,12 +12,8 @@ async def lifespan(app: FastAPI):
         await connection.run_sync(Base.metadata.create_all)
     yield
 
-
 app = FastAPI(lifespan=lifespan)
+app.include_router(tasks_router)
 
-
-async def get_session() -> AsyncGenerator[AsyncSession, None]:
-    async with new_session() as session:
-        yield session
-
-#session: Annotated[AsyncSession, Depends(get_session)]
+from app.test_create_db.create import create_db_router
+app.include_router(create_db_router)
