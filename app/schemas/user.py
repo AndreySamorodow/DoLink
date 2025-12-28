@@ -2,7 +2,6 @@ from typing import Optional
 from pydantic import BaseModel, EmailStr, Field
 
 
-
 # Для ввода данных (регистрация)
 class UserCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=30)
@@ -12,9 +11,9 @@ class UserCreate(BaseModel):
 
 
 # Для ввода данных (обновление)
-class UserUpdate(BaseModel):
-    name: Optional[str] = Field(None, min_length=1, max_length=30)
-    email: Optional[EmailStr] = None
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str = Field(..., min_length=6, max_length=25)
 
 
 # Для ввода данных (смена пароля)
