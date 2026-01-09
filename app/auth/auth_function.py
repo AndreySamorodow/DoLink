@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
-from fastapi import HTTPException, status
-from jose import jwt
+from fastapi import Depends, HTTPException, Request, status
+from jose import jwt, JWTError
 from passlib.context import CryptContext
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -32,6 +32,13 @@ def create_access_token(data: dict):
     return encoded_jwt
 
 
+def get_token(request: Request):
+    token = request.cookies.get("LinkDo_access_token")
+    if not token:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+    return token
+
+
 async def verify_user_reg_data(db: AsyncSession, user_data: UserCreate):
     verify_email = await UserDao.find_one_or_none(db, email=user_data.email)
 
@@ -46,4 +53,21 @@ async def verify_user_log_data(db: AsyncSession, user_data: UserLogin):
     if not user or not verify_password(user_data.password, user.hashed_password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="False data")
     return user
-    
+
+
+async def get_user_id(token = Depends(get_token)):
+    try:
+        payload = jwt.decode(
+        token, settings.SECRET_KEY, settings.ALGORITHM
+    )
+    except JWTError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+
+    expire = payload.get("exp")
+    if (not expire) or (int(expire) < datetime.utcnow().timestamp()):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+    user_id = payload.get("sub")
+    if not user_id:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+        
+    return int(user_id)

@@ -11,5 +11,11 @@ class BaseDao:
         result = await db.execute(query)
         return result.scalar_one_or_none()
     
+    @classmethod
+    async def find_by_id(cls, db, id: int):
+        query = select(cls.model).filter_by(id)
+        result = await db.execute(query)
+        return result.scalar_one_or_none()
+    
 class UserDao(BaseDao):
     model = User

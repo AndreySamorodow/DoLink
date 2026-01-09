@@ -2,6 +2,7 @@ from typing import List, Optional
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
+from app.auth.auth_function import get_user_id
 from app.models.task import Task
 from app.schemas.task import TaskCreate
 
@@ -29,10 +30,20 @@ class TaskRepository:
 
 
 
-    async def create(self, product_data: TaskCreate) -> Task:
-        db_product = Task(**product_data.model_dump())
-        self.db.add(db_product)
-        self.db.commit()
-        self.db.refresh(db_product)
-        return db_product
-    
+    async def create(self, task_data: TaskCreate, user_id) -> Task:
+        try:
+            task_dict = task_data.model_dump()
+            task_dict["author_id"] = user_id
+                
+            db_task = Task(**task_dict)
+                
+            self.db.add(db_task)
+            await self.db.commit()  
+            await self.db.refresh(db_task)
+                
+            return db_task
+                
+        except Exception as e:
+            await self.db.rollback()  # Откат в случае ошибки
+            raise e
+        

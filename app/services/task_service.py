@@ -1,9 +1,14 @@
-from fastapi import HTTPException, status
+from datetime import datetime
+from fastapi import Depends, HTTPException, Response, status
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.auth.auth_function import get_token
 from app.repository.category_repository import CategoryRepository
 from app.repository.task_repository import TaskRepository
-from app.schemas.task import TaskListResponse, TaskResponse
+from app.schemas.task import TaskCreate, TaskListResponse, TaskResponse
+from app.database.dao import UserDao
+from app.config import settings
 
 
 class TaskService:
@@ -37,3 +42,11 @@ class TaskService:
         
         return [TaskResponse.model_validate(task)]
     
+
+    async def create_task(self, task_data: TaskCreate, user_id):
+        category = await self.category_repository.get_by_id(task_data.category_id)
+        if not category:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Category does not exist")
+
+        task = await self.task_repository.create(task_data, user_id)
+        return TaskResponse.model_validate(task)

@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 
 
 
@@ -18,11 +18,21 @@ class TaskResponse(BaseModel):
     id: int = Field(..., description="Unique task ID")
     short_description: str
     description: str
-    price: float
-    category: str
-
-    class Config:   
+    price: int
+    category: str  # Ожидаем строку
+    author_id: int
+    
+    class Config:
         from_attributes = True
+    
+    @validator('category', pre=True)
+    def extract_category_name(cls, v):
+        if hasattr(v, 'name'):
+            return v.name
+        elif isinstance(v, str):
+            return v
+        else:
+            return str(v)
 
 
 
