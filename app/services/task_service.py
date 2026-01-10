@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.auth.auth_function import get_token
 from app.repository.category_repository import CategoryRepository
 from app.repository.task_repository import TaskRepository
+from app.repository.user_repository import UserRepository
 from app.schemas.task import TaskCreate, TaskListResponse, TaskResponse
 from app.database.dao import UserDao
 from app.config import settings
@@ -15,6 +16,7 @@ class TaskService:
     def __init__(self, db: AsyncSession):
         self.task_repository = TaskRepository(db)
         self.category_repository = CategoryRepository(db)
+        self.user_repository = UserRepository(db)
 
 
     async def get_all_tasks(self) -> TaskListResponse:
@@ -40,8 +42,17 @@ class TaskService:
         if not task:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
         
-        return [TaskResponse.model_validate(task)]
+        return TaskResponse.model_validate(task)
     
+    async def get_task_by_author_id(self, user_id):
+        #author = await self.user_repository.get_by_id(user_id)
+        #if not author:
+        #    raise HTTPException(
+        #        status_code=status.HTTP_401_UNAUTHORIZED)
+        tasks = await self.task_repository.get_by_author_id(user_id)
+        tasks_response = [TaskResponse.model_validate(task) for task in tasks]
+        return TaskListResponse(tasks=tasks_response, total=len(tasks_response))
+
 
     async def create_task(self, task_data: TaskCreate, user_id):
         category = await self.category_repository.get_by_id(task_data.category_id)

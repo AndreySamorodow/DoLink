@@ -28,6 +28,10 @@ class TaskRepository:
         result = await self.db.execute(stmt)
         return result.scalar_one_or_none()
 
+    async def get_by_author_id(self, user_id):
+        stmt = select(Task).options(joinedload(Task.category), joinedload(Task.author)).filter_by(author_id=user_id)
+        result = await self.db.execute(stmt)
+        return result.scalars().all()
 
 
     async def create(self, task_data: TaskCreate, user_id) -> Task:

@@ -1,0 +1,1704 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkDo - Фриланс биржа</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #7209b7;
+            --success: #4cc9f0;
+            --warning: #f8961e;
+            --danger: #f94144;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fb;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background-color: white;
+            box-shadow: var(--box-shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .logo i {
+            color: var(--secondary);
+        }
+
+        .search-container {
+            display: flex;
+            align-items: center;
+            background-color: var(--light-gray);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            flex: 0 1 400px;
+        }
+
+        .search-container input {
+            flex: 1;
+            padding: 12px 15px;
+            border: none;
+            background-color: transparent;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .search-container button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .search-container button:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: var(--border-radius);
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-outline:hover {
+            background-color: rgba(67, 97, 238, 0.1);
+        }
+
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #3ab5d9;
+        }
+
+        .btn-warning {
+            background-color: var(--warning);
+            color: white;
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Toast notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .toast {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            box-shadow: var(--box-shadow);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 300px;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast-success {
+            border-left: 4px solid var(--success);
+        }
+
+        .toast-error {
+            border-left: 4px solid var(--danger);
+        }
+
+        .toast-info {
+            border-left: 4px solid var(--primary);
+        }
+
+        .toast-icon {
+            font-size: 1.2rem;
+        }
+
+        .toast-success .toast-icon {
+            color: var(--success);
+        }
+
+        .toast-error .toast-icon {
+            color: var(--danger);
+        }
+
+        .toast-info .toast-icon {
+            color: var(--primary);
+        }
+
+        /* Main content */
+        .main-container {
+            display: flex;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            flex: 0 0 250px;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 25px;
+            height: fit-content;
+        }
+
+        .sidebar h3 {
+            margin-bottom: 20px;
+            color: var(--primary);
+            border-bottom: 2px solid var(--light-gray);
+            padding-bottom: 10px;
+        }
+
+        .category-list {
+            list-style: none;
+        }
+
+        .category-item {
+            padding: 12px 15px;
+            border-radius: var(--border-radius);
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .category-item:hover {
+            background-color: var(--light-gray);
+        }
+
+        .category-item.active {
+            background-color: rgba(67, 97, 238, 0.1);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .category-count {
+            background-color: var(--light-gray);
+            color: var(--gray);
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+
+        .category-item.active .category-count {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        /* Main content */
+        .content {
+            flex: 1;
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .content-header h1 {
+            color: var(--dark);
+        }
+
+        .filters {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Loading spinner */
+        .spinner {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(67, 97, 238, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        .loading-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 60px;
+            grid-column: 1 / -1;
+        }
+
+        /* Tasks */
+        .task-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .task-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+            transition: var(--transition);
+            border: 1px solid transparent;
+        }
+
+        .task-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+            border-color: var(--primary);
+        }
+
+        .task-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .task-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--dark);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .task-price {
+            background-color: rgba(76, 201, 240, 0.1);
+            color: var(--success);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+
+        .task-category {
+            display: inline-block;
+            background-color: rgba(114, 9, 183, 0.1);
+            color: var(--secondary);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 15px;
+        }
+
+        .task-description {
+            color: var(--gray);
+            font-size: 0.95rem;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .task-footer {
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .task-author {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .author-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .author-info h4 {
+            font-size: 0.95rem;
+            margin-bottom: 2px;
+        }
+
+        .author-info p {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+
+        .task-id {
+            color: var(--gray);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Modals */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 500px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            color: var(--primary);
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+            transition: var(--transition);
+        }
+
+        .close-modal:hover {
+            color: var(--dark);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--light-gray);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+
+        textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        select.form-control {
+            cursor: pointer;
+        }
+
+        /* Profile */
+        .profile-container {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 30px;
+            margin-top: 30px;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        .profile-info h2 {
+            margin-bottom: 5px;
+        }
+
+        .profile-info p {
+            color: var(--gray);
+        }
+
+        .my-tasks-title {
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        /* Task details modal */
+        .task-details {
+            background-color: var(--light);
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin-top: 10px;
+        }
+
+        .task-details p {
+            margin-bottom: 10px;
+        }
+
+        .task-details strong {
+            color: var(--primary);
+        }
+
+        /* Footer */
+        footer {
+            background-color: white;
+            margin-top: 50px;
+            padding: 30px 0;
+            border-top: 1px solid var(--light-gray);
+        }
+
+        .footer-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .footer-links a {
+            color: var(--gray);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        .copyright {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                flex: none;
+                width: 100%;
+            }
+            
+            .task-list {
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .search-container {
+                width: 100%;
+            }
+            
+            .task-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-container {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .toast {
+                min-width: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Toast notifications -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Header -->
+    <header>
+        <div class="container header-container">
+            <a href="#" class="logo" onclick="showHomePage(); return false;">
+                <i class="fas fa-link"></i>
+                <span>LinkDo</span>
+            </a>
+            
+            <div class="search-container">
+                <input type="text" id="search-task-id" placeholder="Поиск задачи по ID...">
+                <button onclick="searchTaskById()" id="search-btn">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+            
+            <div class="auth-buttons">
+                <button class="btn btn-outline" id="login-btn" onclick="showLoginModal()">
+                    <i class="fas fa-sign-in-alt"></i> Вход
+                </button>
+                <button class="btn btn-primary" id="register-btn" onclick="showRegisterModal()">
+                    <i class="fas fa-user-plus"></i> Регистрация
+                </button>
+                <button class="btn btn-success" id="profile-btn" onclick="showProfilePage()" style="display: none;">
+                    <i class="fas fa-user"></i> Профиль
+                </button>
+                <button class="btn btn-outline" id="logout-btn" onclick="logout()" style="display: none;">
+                    <i class="fas fa-sign-out-alt"></i> Выйти
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container main-container">
+        <!-- Sidebar with categories -->
+        <aside class="sidebar">
+            <h3>Категории</h3>
+            <ul class="category-list" id="category-list">
+                <!-- Categories will be loaded here -->
+            </ul>
+            
+            <div style="margin-top: 30px;">
+                <h3>Статистика</h3>
+                <div style="margin-top: 15px; padding: 15px; background-color: var(--light-gray); border-radius: var(--border-radius);">
+                    <p style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span>Всего задач:</span>
+                        <strong id="total-tasks">0</strong>
+                    </p>
+                    <p style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span>Мои задачи:</span>
+                        <strong id="my-tasks-count">0</strong>
+                    </p>
+                    <p style="display: flex; justify-content: space-between;">
+                        <span>Выполнено:</span>
+                        <strong id="completed-tasks">0</strong>
+                    </p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main content area -->
+        <main class="content">
+            <div class="content-header">
+                <h1 id="page-title">Все задачи</h1>
+                <div class="filters">
+                    <button class="btn btn-outline" onclick="showCreateTaskModal()" id="create-task-btn" style="display: none;">
+                        <i class="fas fa-plus"></i> Создать задачу
+                    </button>
+                    <button class="btn btn-outline" onclick="showAllTasks()">
+                        <i class="fas fa-list"></i> Все задачи
+                    </button>
+                </div>
+            </div>
+
+            <!-- Task list -->
+            <div class="task-list" id="task-list">
+                <!-- Tasks will be loaded here -->
+            </div>
+
+            <!-- Profile section (hidden by default) -->
+            <div id="profile-section" style="display: none;">
+                <div class="profile-container">
+                    <div class="profile-header">
+                        <div class="profile-avatar" id="profile-avatar">U</div>
+                        <div class="profile-info">
+                            <h2 id="profile-name">Пользователь</h2>
+                            <p id="profile-email">user@example.com</p>
+                        </div>
+                    </div>
+                    
+                    <h3 class="my-tasks-title">Мои задачи</h3>
+                    <div class="task-list" id="my-task-list">
+                        <!-- User's tasks will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container footer-container">
+            <div class="footer-links">
+                <a href="#">О нас</a>
+                <a href="#">Контакты</a>
+                <a href="#">Помощь</a>
+                <a href="#">Условия использования</a>
+            </div>
+            <div class="copyright">
+                &copy; 2023 LinkDo. Все права защищены.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Login Modal -->
+    <div class="modal" id="login-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Вход в систему</h2>
+                <button class="close-modal" onclick="closeModal('login-modal')">&times;</button>
+            </div>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" class="form-control" placeholder="Ваш email" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Пароль</label>
+                    <input type="password" id="login-password" class="form-control" placeholder="Ваш пароль" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;" id="login-submit-btn">
+                    <i class="fas fa-sign-in-alt"></i> Войти
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div class="modal" id="register-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Регистрация</h2>
+                <button class="close-modal" onclick="closeModal('register-modal')">&times;</button>
+            </div>
+            <form id="register-form">
+                <div class="form-group">
+                    <label for="register-name">Имя</label>
+                    <input type="text" id="register-name" class="form-control" placeholder="Ваше имя" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-email">Email</label>
+                    <input type="email" id="register-email" class="form-control" placeholder="Ваш email" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-password">Пароль</label>
+                    <input type="password" id="register-password" class="form-control" placeholder="Придумайте пароль" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-password-replay">Повторите пароль</label>
+                    <input type="password" id="register-password-replay" class="form-control" placeholder="Повторите пароль" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;" id="register-submit-btn">
+                    <i class="fas fa-user-plus"></i> Зарегистрироваться
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Create Task Modal -->
+    <div class="modal" id="create-task-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Создать новую задачу</h2>
+                <button class="close-modal" onclick="closeModal('create-task-modal')">&times;</button>
+            </div>
+            <form id="create-task-form">
+                <div class="form-group">
+                    <label for="task-short-description">Краткое описание</label>
+                    <input type="text" id="task-short-description" class="form-control" placeholder="Краткое описание задачи" required>
+                </div>
+                <div class="form-group">
+                    <label for="task-description">Подробное описание</label>
+                    <textarea id="task-description" class="form-control" placeholder="Подробное описание задачи..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="task-price">Цена (руб.)</label>
+                    <input type="number" id="task-price" class="form-control" placeholder="Цена задачи" required min="1">
+                </div>
+                <div class="form-group">
+                    <label for="task-category-id">ID категории</label>
+                    <input type="number" id="task-category-id" class="form-control" placeholder="ID категории (1-6)" required min="1" max="6">
+                </div>
+                <button type="submit" class="btn btn-success" style="width: 100%;" id="create-task-submit-btn">
+                    <i class="fas fa-plus"></i> Создать задачу
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Task Details Modal -->
+    <div class="modal" id="task-details-modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h2 id="task-details-title">Детали задачи</h2>
+                <button class="close-modal" onclick="closeModal('task-details-modal')">&times;</button>
+            </div>
+            <div id="task-details-content">
+                <!-- Task details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Конфигурация API - ТОЛЬКО существующие эндпоинты
+        const API_CONFIG = {
+            BASE_URL: 'http://localhost:8000',
+            ENDPOINTS: {
+                // ТОЛЬКО те эндпоинты, которые есть у вас:
+                REGISTER: '/api/user/register',
+                LOGIN: '/api/user/login',
+                LOGOUT: '/api/user/logout',
+                
+                // ТОЛЬКО те эндпоинты, которые есть у вас:
+                TASKS: '/api/tasks',  // GET все задачи
+                TASK_BY_ID: '/api/tasks',  // GET /api/tasks/{task_id}
+                TASKS_BY_CATEGORY: '/api/tasks/category',  // GET /api/tasks/category/{category_id}
+                MY_TASKS: '/api/tasks/profile/my_task',  // GET мои задачи
+                CREATE_TASK: '/api/tasks/create'  // POST создание задачи
+            },
+            
+            // Получить токен из куки
+            getToken() {
+                const cookies = document.cookie.split(';');
+                for (let cookie of cookies) {
+                    const [name, value] = cookie.trim().split('=');
+                    if (name === 'LinkDo_access_token') {
+                        return value;
+                    }
+                }
+                return null;
+            },
+            
+            // Заголовки для запросов
+            getHeaders(includeAuth = true) {
+                const headers = {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                };
+                
+                if (includeAuth) {
+                    const token = this.getToken();
+                    if (token) {
+                        headers['Authorization'] = `Bearer ${token}`;
+                    }
+                }
+                
+                return headers;
+            }
+        };
+
+        // Глобальные переменные
+        let categories = [];  // Категории будем хранить локально
+        let tasks = [];
+        let currentUser = null;
+        let myTasks = [];
+
+        // Сохранить пользователя в localStorage
+        function saveUserToStorage(user) {
+            if (user) {
+                localStorage.setItem('currentUser', JSON.stringify(user));
+            } else {
+                localStorage.removeItem('currentUser');
+            }
+        }
+
+        // Загрузить пользователя из localStorage
+        function loadUserFromStorage() {
+            const userData = localStorage.getItem('currentUser');
+            if (userData) {
+                return JSON.parse(userData);
+            }
+            return null;
+        }
+
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            // Загружаем пользователя из localStorage
+            currentUser = loadUserFromStorage();
+            
+            // Проверяем есть ли токен в куках
+            const token = API_CONFIG.getToken();
+            
+            // Если есть пользователь в localStorage ИЛИ есть токен в куках
+            if (currentUser || token) {
+                checkLoginStatus();
+                // Показываем, что пользователь залогинен
+                document.getElementById('login-btn').style.display = 'none';
+                document.getElementById('register-btn').style.display = 'none';
+                document.getElementById('profile-btn').style.display = 'inline-flex';
+                document.getElementById('logout-btn').style.display = 'inline-flex';
+                document.getElementById('create-task-btn').style.display = 'inline-flex';
+            } else {
+                // Если нет ни пользователя, ни токена
+                checkLoginStatus();
+            }
+            
+            // Загружаем категории (локально, так как нет эндпоинта /api/categories)
+            loadCategories();
+            
+            // Загружаем задачи
+            loadTasks();
+            
+            // Настройка обработчиков форм
+            document.getElementById('login-form').addEventListener('submit', handleLogin);
+            document.getElementById('register-form').addEventListener('submit', handleRegister);
+            document.getElementById('create-task-form').addEventListener('submit', handleCreateTask);
+            
+            // Поиск по Enter
+            document.getElementById('search-task-id').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchTaskById();
+                }
+            });
+        });
+
+        // ========== УТИЛИТЫ ==========
+
+        // Показать toast уведомление
+        function showToast(message, type = 'info') {
+            const toastContainer = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `
+                <div class="toast-icon">
+                    ${type === 'success' ? '<i class="fas fa-check-circle"></i>' : 
+                      type === 'error' ? '<i class="fas fa-exclamation-circle"></i>' : 
+                      '<i class="fas fa-info-circle"></i>'}
+                </div>
+                <div>${message}</div>
+            `;
+            
+            toastContainer.appendChild(toast);
+            
+            // Анимация появления
+            setTimeout(() => toast.classList.add('show'), 10);
+            
+            // Автоматическое скрытие
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        // Показать ошибку
+        function showError(message) {
+            showToast(message, 'error');
+            console.error(message);
+        }
+
+        // Показать успех
+        function showSuccess(message) {
+            showToast(message, 'success');
+        }
+
+        // Показать информацию
+        function showInfo(message) {
+            showToast(message, 'info');
+        }
+
+        // Установить состояние загрузки для кнопки
+        function setButtonLoading(buttonId, isLoading) {
+            const button = document.getElementById(buttonId);
+            if (!button) return;
+            
+            if (isLoading) {
+                button.disabled = true;
+                button.innerHTML = '<div class="loading"></div>';
+            } else {
+                button.disabled = false;
+                const originalText = buttonId.includes('login') ? '<i class="fas fa-sign-in-alt"></i> Войти' :
+                                   buttonId.includes('register') ? '<i class="fas fa-user-plus"></i> Зарегистрироваться' :
+                                   buttonId.includes('create-task') ? '<i class="fas fa-plus"></i> Создать задачу' :
+                                   '<i class="fas fa-search"></i>';
+                button.innerHTML = originalText;
+            }
+        }
+
+        // ========== API ФУНКЦИИ ==========
+
+        // Загрузить все задачи
+        async function loadTasks() {
+            const taskList = document.getElementById('task-list');
+            taskList.innerHTML = '<div class="loading-container"><div class="spinner"></div></div>';
+            
+            try {
+                const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.TASKS}`, {
+                    method: 'GET',
+                    headers: API_CONFIG.getHeaders(),
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // Обработка ответа
+                    if (Array.isArray(data)) {
+                        tasks = data;
+                    } else if (data.tasks) {
+                        tasks = data.tasks;
+                    } else if (data.items) {
+                        tasks = data.items;
+                    } else {
+                        tasks = [];
+                    }
+                    
+                    renderTasks(tasks, taskList);
+                    updateStatistics();
+                    
+                    // Если пользователь залогинен, загружаем его задачи
+                    if (currentUser) {
+                        loadMyTasks();
+                    }
+                } else if (response.status === 401) {
+                    // Не авторизован, но задачи могут быть публичными
+                    taskList.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: var(--gray); padding: 40px;">Задачи не найдены или требуется авторизация</p>';
+                } else {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки задач:', error);
+                taskList.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: var(--gray); padding: 40px;">Ошибка загрузки задач</p>';
+            }
+        }
+
+        // Загрузить категории (локально, так как нет эндпоинта)
+        function loadCategories() {
+            // Локальные категории, соответствующие вашим category_id
+            categories = [
+                { id: 1, name: "Веб-разработка" },
+                { id: 2, name: "Дизайн" },
+                { id: 3, name: "Маркетинг" },
+                { id: 4, name: "Копирайтинг" },
+                { id: 5, name: "Переводы" },
+                { id: 6, name: "Мобильные приложения" }
+            ];
+            
+            renderCategories();
+        }
+
+        // Загрузить задачи пользователя
+        async function loadMyTasks() {
+            if (!currentUser) return;
+            
+            try {
+                const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.MY_TASKS}`, {
+                    method: 'GET',
+                    headers: API_CONFIG.getHeaders(),
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    if (Array.isArray(data)) {
+                        myTasks = data;
+                    } else if (data.tasks) {
+                        myTasks = data.tasks;
+                    } else if (data.items) {
+                        myTasks = data.items;
+                    } else {
+                        myTasks = [];
+                    }
+                    
+                    document.getElementById('my-tasks-count').textContent = myTasks.length;
+                    
+                    // Если открыт профиль, обновляем список
+                    if (document.getElementById('profile-section').style.display === 'block') {
+                        const myTaskList = document.getElementById('my-task-list');
+                        renderTasks(myTasks, myTaskList);
+                    }
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки моих задач:', error);
+            }
+        }
+
+        // Получить задачу по ID
+        async function getTaskById(taskId) {
+            try {
+                const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.TASK_BY_ID}/${taskId}`, {
+                    method: 'GET',
+                    headers: API_CONFIG.getHeaders(),
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    return await response.json();
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                console.error('Ошибка получения задачи:', error);
+                return null;
+            }
+        }
+
+        // ========== ОБРАБОТЧИКИ ФОРМ ==========
+
+        // Вход в систему
+        async function handleLogin(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            if (!email || !password) {
+                showError('Заполните все поля');
+                return;
+            }
+            
+            setButtonLoading('login-submit-btn', true);
+            
+            try {
+                const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.LOGIN}`, {
+                    method: 'POST',
+                    headers: API_CONFIG.getHeaders(false),
+                    body: JSON.stringify({
+                        email: email,
+                        password: password
+                    }),
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // Сохраняем пользователя
+                    currentUser = {
+                        id: data.id,
+                        name: data.name || email.split('@')[0],
+                        email: data.email || email
+                    };
+                    
+                    // Сохраняем в localStorage
+                    saveUserToStorage(currentUser);
+                    
+                    checkLoginStatus();
+                    closeModal('login-modal');
+                    showSuccess('Вход выполнен успешно!');
+                    
+                    // Загружаем данные
+                    await Promise.all([loadTasks(), loadMyTasks()]);
+                    
+                    document.getElementById('login-form').reset();
+                } else {
+                    const errorData = await response.json().catch(() => ({}));
+                    showError(errorData.detail || 'Ошибка входа');
+                }
+            } catch (error) {
+                showError('Ошибка соединения с сервером');
+            } finally {
+                setButtonLoading('login-submit-btn', false);
+            }
+        }
+
+        // Регистрация
+        async function handleRegister(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('register-name').value;
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
+            const passwordReplay = document.getElementById('register-password-replay').value;
+            
+            if (!name || !email || !password || !passwordReplay) {
+                showError('Заполните все поля');
+                return;
+            }
+            
+            if (password !== passwordReplay) {
+                showError('Пароли не совпадают');
+                return;
+            }
+            
+            setButtonLoading('register-submit-btn', true);
+            
+            try {
+                const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REGISTER}`, {
+                    method: 'POST',
+                    headers: API_CONFIG.getHeaders(false),
+                    body: JSON.stringify({
+                        name: name,
+                        email: email,
+                        password: password,
+                        password_replay: passwordReplay
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    currentUser = {
+                        id: data.id,
+                        name: data.name || name,
+                        email: data.email || email
+                    };
+                    
+                    // Сохраняем в localStorage
+                    saveUserToStorage(currentUser);
+                    
+                    checkLoginStatus();
+                    closeModal('register-modal');
+                    showSuccess('Регистрация выполнена успешно!');
+                    
+                    // Автоматический вход после регистрации
+                    await handleLoginAfterRegister(email, password);
+                    
+                    document.getElementById('register-form').reset();
+                } else {
+                    const errorData = await response.json().catch(() => ({}));
+                    showError(errorData.detail || 'Ошибка регистрации');
+                }
+            } catch (error) {
+                showError('Ошибка соединения с сервером');
+            } finally {
+                setButtonLoading('register-submit-btn', false);
+            }
+        }
+
+        // Создание задачи
+        async function handleCreateTask(e) {
+            e.preventDefault();
+            
+            const shortDescription = document.getElementById('task-short-description').value;
+            const description = document.getElementById('task-description').value;
+            const price = parseInt(document.getElementById('task-price').value);
+            const categoryId = parseInt(document.getElementById('task-category-id').value);
+            
+            if (!shortDescription || !price || !categoryId) {
+                showError('Заполните обязательные поля');
+                return;
+            }
+            
+            setButtonLoading('create-task-submit-btn', true);
+            
+            try {
+                const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.CREATE_TASK}`, {
+                    method: 'POST',
+                    headers: API_CONFIG.getHeaders(),
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        short_description: shortDescription,
+                        description: description || null,
+                        price: price,
+                        category_id: categoryId
+                    })
+                });
+                
+                if (response.ok) {
+                    const newTask = await response.json();
+                    
+                    closeModal('create-task-modal');
+                    showSuccess('Задача успешно создана!');
+                    
+                    // Перезагружаем задачи
+                    await Promise.all([loadTasks(), loadMyTasks()]);
+                    
+                    document.getElementById('create-task-form').reset();
+                } else if (response.status === 401) {
+                    showError('Войдите в систему для создания задач');
+                } else {
+                    const errorData = await response.json().catch(() => ({}));
+                    showError(errorData.detail || 'Ошибка создания задачи');
+                }
+            } catch (error) {
+                showError('Ошибка соединения с сервером');
+            } finally {
+                setButtonLoading('create-task-submit-btn', false);
+            }
+        }
+
+        // ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
+
+        // Автовход после регистрации
+        async function handleLoginAfterRegister(email, password) {
+            try {
+                const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.LOGIN}`, {
+                    method: 'POST',
+                    headers: API_CONFIG.getHeaders(false),
+                    body: JSON.stringify({
+                        email: email,
+                        password: password
+                    }),
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    await Promise.all([loadTasks(), loadMyTasks()]);
+                }
+            } catch (error) {
+                console.error('Ошибка автоматического входа:', error);
+            }
+        }
+
+        // Выход из системы
+        async function logout() {
+            try {
+                await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.LOGOUT}`, {
+                    method: 'POST',
+                    headers: API_CONFIG.getHeaders(),
+                    credentials: 'include'
+                });
+            } catch (error) {
+                console.error('Ошибка выхода:', error);
+            } finally {
+                // Очищаем локальные данные
+                currentUser = null;
+                myTasks = [];
+                saveUserToStorage(null);
+                
+                // Удаляем куки
+                document.cookie = "LinkDo_access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                
+                checkLoginStatus();
+                showInfo('Вы вышли из системы');
+                showAllTasks();
+            }
+        }
+
+        // Проверка статуса авторизации
+        function checkLoginStatus() {
+            if (currentUser) {
+                document.getElementById('login-btn').style.display = 'none';
+                document.getElementById('register-btn').style.display = 'none';
+                document.getElementById('profile-btn').style.display = 'inline-flex';
+                document.getElementById('logout-btn').style.display = 'inline-flex';
+                document.getElementById('create-task-btn').style.display = 'inline-flex';
+            } else {
+                document.getElementById('login-btn').style.display = 'inline-flex';
+                document.getElementById('register-btn').style.display = 'inline-flex';
+                document.getElementById('profile-btn').style.display = 'none';
+                document.getElementById('logout-btn').style.display = 'none';
+                document.getElementById('create-task-btn').style.display = 'none';
+            }
+        }
+
+        // ========== ОТОБРАЖЕНИЕ ДАННЫХ ==========
+
+        // Отобразить задачи
+        function renderTasks(tasksArray, containerElement) {
+            containerElement.innerHTML = '';
+            
+            if (!tasksArray || tasksArray.length === 0) {
+                containerElement.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: var(--gray); padding: 40px;">Задачи не найдены</p>';
+                return;
+            }
+            
+            tasksArray.forEach(task => {
+                const taskCard = createTaskCard(task);
+                containerElement.appendChild(taskCard);
+            });
+        }
+
+        // Создать карточку задачи
+        function createTaskCard(task) {
+            const card = document.createElement('div');
+            card.className = 'task-card';
+            
+            // Находим название категории по ID
+            let categoryName = 'Категория ' + task.category_id;
+            const category = categories.find(c => c.id === task.category_id);
+            if (category) {
+                categoryName = category.name;
+            }
+            
+            // Форматируем цену
+            const priceFormatted = task.price ? new Intl.NumberFormat('ru-RU').format(task.price) + ' ₽' : 'Цена не указана';
+            
+            card.innerHTML = `
+                <div class="task-header">
+                    <div class="task-title">
+                        <span>${task.short_description || 'Без названия'}</span>
+                        <span class="task-price">${priceFormatted}</span>
+                    </div>
+                    <div class="task-category">${categoryName}</div>
+                    <div class="task-description">${task.description || 'Нет описания'}</div>
+                </div>
+                <div class="task-footer">
+                    <div class="task-author">
+                        <div class="author-avatar">${task.author_id ? 'U' : 'A'}</div>
+                        <div class="author-info">
+                            <h4>${task.author_id ? 'Пользователь #' + task.author_id : 'Автор'}</h4>
+                        </div>
+                    </div>
+                    <div class="task-id">#${task.id || '?'}</div>
+                </div>
+            `;
+            
+            // Обработчик клика по карточке
+            card.onclick = async () => {
+                await showTaskDetails(task.id);
+            };
+            
+            return card;
+        }
+
+        // Отобразить детали задачи
+        async function showTaskDetails(taskId) {
+            const task = await getTaskById(taskId);
+            
+            if (!task) {
+                showError('Не удалось загрузить детали задачи');
+                return;
+            }
+            
+            // Находим название категории по ID
+            let categoryName = 'Категория ' + task.category_id;
+            const category = categories.find(c => c.id === task.category_id);
+            if (category) {
+                categoryName = category.name;
+            }
+            
+            const detailsContent = `
+                <div class="task-details">
+                    <p><strong>ID задачи:</strong> ${task.id || 'Не указан'}</p>
+                    <p><strong>Краткое описание:</strong> ${task.short_description || 'Не указано'}</p>
+                    <p><strong>Категория:</strong> ${categoryName}</p>
+                    <p><strong>Цена:</strong> ${task.price ? new Intl.NumberFormat('ru-RU').format(task.price) + ' ₽' : 'Не указана'}</p>
+                    <p><strong>ID автора:</strong> ${task.author_id || 'Не указан'}</p>
+                    <p><strong>Подробное описание:</strong></p>
+                    <p>${task.description || 'Нет описания'}</p>
+                </div>
+            `;
+            
+            document.getElementById('task-details-title').textContent = task.short_description || 'Детали задачи';
+            document.getElementById('task-details-content').innerHTML = detailsContent;
+            document.getElementById('task-details-modal').classList.add('active');
+        }
+
+        // Отобразить категории
+        function renderCategories() {
+            const categoryList = document.getElementById('category-list');
+            categoryList.innerHTML = '';
+            
+            // Добавить "Все категории"
+            const allItem = document.createElement('li');
+            allItem.className = 'category-item active';
+            allItem.innerHTML = `
+                <span>Все категории</span>
+                <span class="category-count">${tasks.length}</span>
+            `;
+            allItem.onclick = () => {
+                document.querySelectorAll('.category-item').forEach(item => item.classList.remove('active'));
+                allItem.classList.add('active');
+                showAllTasks();
+            };
+            categoryList.appendChild(allItem);
+            
+            // Добавить остальные категории
+            categories.forEach(category => {
+                // Подсчитываем задачи в категории
+                const tasksInCategory = tasks.filter(task => task.category_id === category.id).length;
+                
+                const item = document.createElement('li');
+                item.className = 'category-item';
+                item.innerHTML = `
+                    <span>${category.name}</span>
+                    <span class="category-count">${tasksInCategory}</span>
+                `;
+                item.onclick = async () => {
+                    document.querySelectorAll('.category-item').forEach(item => item.classList.remove('active'));
+                    item.classList.add('active');
+                    
+                    await showTasksByCategory(category.id);
+                };
+                categoryList.appendChild(item);
+            });
+        }
+
+        // Показать задачи по категории
+        async function showTasksByCategory(categoryId) {
+            const category = categories.find(c => c.id === categoryId);
+            document.getElementById('page-title').textContent = `Задачи: ${category?.name || 'Категория'}`;
+            document.getElementById('profile-section').style.display = 'none';
+            document.getElementById('task-list').style.display = 'grid';
+            
+            const taskList = document.getElementById('task-list');
+            taskList.innerHTML = '<div class="loading-container"><div class="spinner"></div></div>';
+            
+            try {
+                const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.TASKS_BY_CATEGORY}/${categoryId}`, {
+                    method: 'GET',
+                    headers: API_CONFIG.getHeaders(),
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    let filteredTasks = [];
+                    if (Array.isArray(data)) {
+                        filteredTasks = data;
+                    } else if (data.tasks) {
+                        filteredTasks = data.tasks;
+                    }
+                    
+                    renderTasks(filteredTasks, taskList);
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки задач по категории:', error);
+                taskList.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: var(--gray); padding: 40px;">Ошибка загрузки задач</p>';
+            }
+        }
+
+        // Обновить статистику
+        function updateStatistics() {
+            document.getElementById('total-tasks').textContent = tasks.length;
+            document.getElementById('my-tasks-count').textContent = myTasks.length;
+            document.getElementById('completed-tasks').textContent = 0; // Пока нет данных о выполненных задачах
+        }
+
+        // ========== UI ФУНКЦИИ ==========
+
+        // Показать все задачи
+        function showAllTasks() {
+            document.getElementById('page-title').textContent = 'Все задачи';
+            document.getElementById('profile-section').style.display = 'none';
+            document.getElementById('task-list').style.display = 'grid';
+            
+            // Сбросить активную категорию
+            const categoryItems = document.querySelectorAll('.category-item');
+            if (categoryItems.length > 0) {
+                categoryItems.forEach(item => item.classList.remove('active'));
+                categoryItems[0].classList.add('active');
+            }
+            
+            loadTasks();
+        }
+
+        // Показать домашнюю страницу
+        function showHomePage() {
+            showAllTasks();
+        }
+
+        // Показать профиль
+        async function showProfilePage() {
+            if (!currentUser) {
+                showError('Пожалуйста, войдите в систему');
+                return;
+            }
+            
+            document.getElementById('page-title').textContent = 'Мой профиль';
+            document.getElementById('profile-section').style.display = 'block';
+            document.getElementById('task-list').style.display = 'none';
+            
+            // Обновить информацию профиля
+            document.getElementById('profile-avatar').textContent = currentUser.name.charAt(0).toUpperCase();
+            document.getElementById('profile-name').textContent = currentUser.name;
+            document.getElementById('profile-email').textContent = currentUser.email;
+            
+            // Показать задачи пользователя
+            const myTaskList = document.getElementById('my-task-list');
+            renderTasks(myTasks, myTaskList);
+        }
+
+        // Поиск задачи по ID
+        async function searchTaskById() {
+            const taskId = document.getElementById('search-task-id').value.trim();
+            if (!taskId) {
+                showError('Введите ID задачи');
+                return;
+            }
+            
+            if (isNaN(taskId)) {
+                showError('ID задачи должен быть числом');
+                return;
+            }
+            
+            setButtonLoading('search-btn', true);
+            
+            try {
+                const task = await getTaskById(taskId);
+                
+                if (task) {
+                    await showTaskDetails(taskId);
+                } else {
+                    showError(`Задача с ID ${taskId} не найдена`);
+                }
+            } catch (error) {
+                showError('Ошибка поиска задачи');
+            } finally {
+                setButtonLoading('search-btn', false);
+            }
+        }
+
+        // Показать модальное окно входа
+        function showLoginModal() {
+            document.getElementById('login-modal').classList.add('active');
+        }
+
+        // Показать модальное окно регистрации
+        function showRegisterModal() {
+            document.getElementById('register-modal').classList.add('active');
+        }
+
+        // Показать модальное окно создания задачи
+        function showCreateTaskModal() {
+            if (!currentUser) {
+                showError('Пожалуйста, войдите в систему');
+                return;
+            }
+            document.getElementById('create-task-modal').classList.add('active');
+        }
+
+        // Закрыть модальное окно
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // Закрыть модальные окна при клике вне их
+        window.onclick = function(event) {
+            const modals = document.querySelectorAll('.modal.active');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        };
+    </script>
+</body>
+</html>
