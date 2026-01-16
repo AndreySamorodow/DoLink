@@ -6,6 +6,7 @@ from app.auth.auth_function import get_token, get_user_id
 from app.database.database import get_session
 from app.schemas.task import TaskCreate, TaskListResponse, TaskResponse
 from app.services.task_service import TaskService
+from app.middleware.rate_limit import limiter
 
 router = APIRouter(prefix="/api/tasks", tags=["tasks"])
 
@@ -25,6 +26,12 @@ async def get_task_by_id_router(task_id: int, db: Annotated[AsyncSession, Depend
     return await service.get_task_by_id(task_id)
 
 @router.post("/create", response_model=TaskResponse)
-async def create_task_router(task_data: TaskCreate, db: Annotated[AsyncSession, Depends(get_session)], user_id = Depends(get_user_id)):
+@limiter.limit("1/600 second")
+async def create_task_router(request: Request, task_data: TaskCreate, db: Annotated[AsyncSession, Depends(get_session)], user_id = Depends(get_user_id)):
     service = TaskService(db)
     return await service.create_task(task_data, user_id)
+
+@router.post("/respond/{task_id}", response_model=TaskResponse)
+async def respond_task_router(task_id: int, db: Annotated[AsyncSession, Depends(get_session)], user_id = Depends(get_user_id)):
+    service = TaskService(db)
+    return await service.respond_task(task_id, user_id)

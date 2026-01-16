@@ -3,10 +3,13 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers import tasks_router
-from app.routers import users_router
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIASGIMiddleware
 
 from app.database.database import engine, Base
+from app.middleware.rate_limit import limiter
 
 
 @asynccontextmanager
@@ -16,10 +19,10 @@ async def lifespan(app: FastAPI):
     yield
 
 app = FastAPI(lifespan=lifespan)
-app.include_router(tasks_router)
-app.include_router(users_router)
 
-
+app.state.limiter = limiter
+app.add_middleware(SlowAPIASGIMiddleware)
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 app.add_middleware(
     CORSMiddleware,
@@ -29,7 +32,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
+from app.routers import tasks_router
+from app.routers import users_router
+app.include_router(tasks_router)
+app.include_router(users_router)
 
 from app.test_create_db.create import create_db_router
 app.include_router(create_db_router)

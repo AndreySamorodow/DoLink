@@ -1,5 +1,6 @@
 from typing import Annotated
-from fastapi import APIRouter, Depends, HTTPException, Response
+from fastapi import APIRouter, Depends, HTTPException, Request, Response
+from app.middleware.rate_limit import limiter
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.auth_function import get_user_id
@@ -13,6 +14,9 @@ from app.services.user_service import UserService
 
 router = APIRouter(prefix="/api/user", tags=["users"])
 
+
+
+
 @router.post("/register", response_model=UserResponse)
 async def user_register_router(db: Annotated[AsyncSession, Depends(get_session)], user_data: UserCreate):
     service = UserService(db)
@@ -20,7 +24,8 @@ async def user_register_router(db: Annotated[AsyncSession, Depends(get_session)]
 
 
 @router.post("/login", response_model=UserResponse)
-async def user_login_router(db: Annotated[AsyncSession, Depends(get_session)], user_data: UserLogin, response: Response):
+@limiter.limit("1/minutes")
+async def user_login_router(request: Request, db: Annotated[AsyncSession, Depends(get_session)], user_data: UserLogin, response: Response):
     service = UserService(db)
     return await service.user_login_service(user_data, response)
 

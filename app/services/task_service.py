@@ -45,10 +45,6 @@ class TaskService:
         return TaskResponse.model_validate(task)
     
     async def get_task_by_author_id(self, user_id):
-        #author = await self.user_repository.get_by_id(user_id)
-        #if not author:
-        #    raise HTTPException(
-        #        status_code=status.HTTP_401_UNAUTHORIZED)
         tasks = await self.task_repository.get_by_author_id(user_id)
         tasks_response = [TaskResponse.model_validate(task) for task in tasks]
         return TaskListResponse(tasks=tasks_response, total=len(tasks_response))
@@ -61,3 +57,12 @@ class TaskService:
 
         task = await self.task_repository.create(task_data, user_id)
         return TaskResponse.model_validate(task)
+
+
+
+    async def respond_task(self, task_id: int, user_id: int):
+        task = await self.task_repository.get_by_id(task_id)
+        if not task:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="The task does not exist")
+        
+
