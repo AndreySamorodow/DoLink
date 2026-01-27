@@ -19,7 +19,7 @@ class TaskResponse(BaseModel):
     short_description: str
     description: str
     price: int
-    category: str  # Ожидаем строку
+    category: str  
     author_id: int
     
     class Config:

@@ -4,9 +4,12 @@ from fastapi import Depends, HTTPException, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.auth_function import get_token
+from app.models.proposals import Proposal
 from app.repository.category_repository import CategoryRepository
+from app.repository.proposal_repository import ProposalRepository
 from app.repository.task_repository import TaskRepository
 from app.repository.user_repository import UserRepository
+from app.schemas.proposal import ProposalCreate, ProposalResponse
 from app.schemas.task import TaskCreate, TaskListResponse, TaskResponse
 from app.database.dao import UserDao
 from app.config import settings
@@ -17,6 +20,7 @@ class TaskService:
         self.task_repository = TaskRepository(db)
         self.category_repository = CategoryRepository(db)
         self.user_repository = UserRepository(db)
+        self.proposal_repository = ProposalRepository(db)
 
 
     async def get_all_tasks(self) -> TaskListResponse:
@@ -60,9 +64,12 @@ class TaskService:
 
 
 
-    async def respond_task(self, task_id: int, user_id: int):
+    async def respond_task(self, task_id: int, user_id: int, proposal_data: ProposalCreate) -> ProposalResponse:
         task = await self.task_repository.get_by_id(task_id)
         if not task:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="The task does not exist")
+        
+        proposal = await self.proposal_repository.create(task_id, user_id, proposal_data)
+        return ProposalResponse.model_validate(proposal)
         
 

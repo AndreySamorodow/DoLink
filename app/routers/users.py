@@ -24,7 +24,7 @@ async def user_register_router(db: Annotated[AsyncSession, Depends(get_session)]
 
 
 @router.post("/login", response_model=UserResponse)
-@limiter.limit("1/minutes")
+@limiter.limit("5/minutes")
 async def user_login_router(request: Request, db: Annotated[AsyncSession, Depends(get_session)], user_data: UserLogin, response: Response):
     service = UserService(db)
     return await service.user_login_service(user_data, response)
@@ -36,7 +36,7 @@ async def logout_user(response: Response):
 
 
 @router.get("/profile/my_task")
-async def get_my_task_router(db: Annotated[AsyncSession, Depends(get_session)], user_id = Depends(get_user_id)):
+async def get_my_task_router(db: Annotated[AsyncSession, Depends(get_session)], user_id: Annotated[AsyncSession, Depends(get_user_id)]):
     service = TaskService(db)
     return await service.get_task_by_author_id(user_id)
 

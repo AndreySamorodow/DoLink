@@ -14,6 +14,9 @@ class ProposalResponse(BaseModel):
     status: str = Field(..., )
     created_at: datetime = Field(..., )
 
+    class Config:
+        from_attributes=True
+
 class ProposalResponseList(BaseModel):
     tasks: list[ProposalResponse]
     total: int = Field(..., description='Total number of proposal')
