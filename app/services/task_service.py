@@ -69,6 +69,10 @@ class TaskService:
         if not task:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="The task does not exist")
         
+        proposal_exists = await self.proposal_repository.get_proposal_exists(task_id, user_id)
+        if proposal_exists:
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="You have already responded to this task.")
+
         proposal = await self.proposal_repository.create(task_id, user_id, proposal_data)
         return ProposalResponse.model_validate(proposal)
         

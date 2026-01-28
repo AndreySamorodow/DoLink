@@ -26,11 +26,15 @@ async def get_task_by_id_router(task_id: int, db: Annotated[AsyncSession, Depend
     service = TaskService(db)
     return await service.get_task_by_id(task_id)
 
+
+
 @router.post("/create", response_model=TaskResponse)
 @limiter.limit("1/600 second")
 async def create_task_router(request: Request, task_data: TaskCreate, db: Annotated[AsyncSession, Depends(get_session)], user_id: Annotated[AsyncSession, Depends(get_user_id)]):
     service = TaskService(db)
     return await service.create_task(task_data, user_id)
+
+
 
 @router.post("/respond/{task_id}", response_model=ProposalResponse)
 async def respond_task_router(task_id: int, proposal_data: ProposalCreate, db: Annotated[AsyncSession, Depends(get_session)], user_id: Annotated[AsyncSession, Depends(get_user_id)]):
