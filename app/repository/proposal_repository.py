@@ -3,6 +3,7 @@ from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.proposals import Proposal
+from app.models.task import Task
 
 
 class ProposalRepository:
@@ -38,6 +39,20 @@ class ProposalRepository:
         result = await self.db.execute(query)
         return result.scalar_one_or_none()
 
+    async def verification_user(self, proposal_id: int, user_id: int) -> bool:
+
+        stmt = (
+            select(Task.author_id)
+            .join(Proposal, Proposal.task_id == Task.id)
+            .where(Proposal.id == proposal_id)
+        )
+        
+        result = await self.db.execute(stmt)
+        task_owner_id = result.scalar_one_or_none()
+        
+        return task_owner_id is not None and task_owner_id == user_id
+
+
     async def set_status_approved(self, proposal_id):
         stmt = select(Proposal).filter_by(id=proposal_id)
         result = await self.db.execute(stmt)
@@ -52,3 +67,18 @@ class ProposalRepository:
         await self.db.commit()
         return proposal
 
+    async def set_status_rejected(self, proposal_id):
+        stmt = update(Proposal).where(Proposal.id == proposal_id).values(status="rejected")
+        await self.db.execute(stmt)
+        await self.db.commit()
+
+        query = select(Proposal).filter_by(id=proposal_id)
+        result = await self.db.execute(query)
+        proposal = result.scalar_one_or_none()
+
+        return proposal
+
+    async def set_status_archived(self, task_id):
+        stmt = update(Proposal).where(Proposal.task_id == task_id).values(status="archived")
+        await self.db.execute(stmt)
+        await self.db.commit()

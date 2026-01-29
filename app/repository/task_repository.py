@@ -1,5 +1,5 @@
 from typing import List, Optional
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 from app.auth.auth_function import get_user_id
@@ -51,3 +51,12 @@ class TaskRepository:
             await self.db.rollback()  # Откат в случае ошибки
             raise e
         
+    async def verification_user(self, task_id, user_id):
+        stmt = select(Task).options(joinedload(Task.category), joinedload(Task.author)).filter_by(author_id=user_id, id=task_id)
+        result = await self.db.execute(stmt)
+        return result.scalar_one_or_none()
+    
+    async def delete_task(self, task_id):
+        stmt = delete(Task).where(Task.id == task_id)
+        await self.db.execute(stmt)
+        await self.db.commit()

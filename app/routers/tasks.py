@@ -40,3 +40,10 @@ async def create_task_router(request: Request, task_data: TaskCreate, db: Annota
 async def respond_task_router(task_id: int, proposal_data: ProposalCreate, db: Annotated[AsyncSession, Depends(get_session)], user_id: Annotated[AsyncSession, Depends(get_user_id)]):
     service = TaskService(db)
     return await service.respond_task(task_id, user_id, proposal_data)
+
+
+@router.delete("/delete/{task_id}")
+async def delete_task(task_id: int, user_id: Annotated[AsyncSession, Depends(get_user_id)], db: Annotated[AsyncSession, Depends(get_session)]):
+    service = TaskService(db)
+    await service.verification(task_id, user_id)
+    return await service.delete_task(task_id)

@@ -22,6 +22,12 @@ class TaskService:
         self.user_repository = UserRepository(db)
         self.proposal_repository = ProposalRepository(db)
 
+    async def verification(self, task_id, user_id):
+        task = await self.task_repository.get_by_id(task_id)
+        if not task:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+        if not await self.task_repository.verification_user(task_id, user_id):
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
 
     async def get_all_tasks(self) -> TaskListResponse:
         tasks = await self.task_repository.get_all()
@@ -76,4 +82,9 @@ class TaskService:
         proposal = await self.proposal_repository.create(task_id, user_id, proposal_data)
         return ProposalResponse.model_validate(proposal)
         
+    async def delete_task(self, task_id):
+        await self.task_repository.delete_task(task_id)
+        await self.proposal_repository.set_status_archived(task_id)
+        raise HTTPException(status_code=status.HTTP_200_OK)
 
+    

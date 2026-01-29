@@ -11,6 +11,13 @@ from app.services.proposal_service import ProposalService
 router = APIRouter(prefix="/api/proposal", tags=["proposals"])
 
 @router.patch("/proposal/{proposal_id}/approved")
-async def set_approved_status(proposal_id: int, db: Annotated[AsyncSession, Depends(get_session)]):
+async def set_approved_status(proposal_id: int, db: Annotated[AsyncSession, Depends(get_session)], user_id: Annotated[AsyncSession, Depends(get_user_id)]):
     service = ProposalService(db)
+    await service.verification(proposal_id, user_id)
     return await service.set_approved(proposal_id)
+
+@router.patch("proposal/{proposal_id}/rejected")
+async def set_rejected_status(proposal_id: int, db: Annotated[AsyncSession, Depends(get_session)], user_id: Annotated[AsyncSession, Depends(get_user_id)]):
+    service = ProposalService(db)
+    await service.verification(proposal_id, user_id)
+    return await service.set_rejected(proposal_id)
