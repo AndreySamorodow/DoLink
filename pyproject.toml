@@ -9,6 +9,7 @@ dependencies = [
     "asyncpg>=0.31.0",
     "bcrypt>=5.0.0",
     "fastapi>=0.127.0",
+    "faststream[rabbit]>=0.6.6",
     "jose>=1.0.0",
     "jwt>=1.4.0",
     "passlib[argon2]>=1.7.4",
